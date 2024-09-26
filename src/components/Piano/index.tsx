@@ -2,6 +2,7 @@ import { Flex, ScrollArea } from '@radix-ui/themes';
 import classNames from 'classnames';
 import { ForwardedRef, forwardRef, PropsWithChildren, useImperativeHandle, useRef } from 'react';
 import { filterNotes, Note, noteName } from 'src/utils';
+import { Synth } from 'tone';
 
 import styles from './styles.module.scss';
 
@@ -10,30 +11,11 @@ type PianoProps = {
     startingOctave?: number;
     endingOctave?: number;
     european?: boolean;
+    displayNames?: boolean;
 }
 
 export type PianoRef = {
     playNote: (note: Note) => void;
-}
-
-const audioCtx = new window.AudioContext();
-
-function playNote(frequency: number, duration: number) {
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = 'square';
-    oscillator.frequency.value = frequency;
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    gainNode.gain.value = 0.1;
-
-    oscillator.start();
-
-    setTimeout(() => {
-        oscillator.stop();
-    }, duration);
 }
 
 type NoteComponentProps = {
@@ -75,12 +57,15 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
         startingOctave = 3,
         endingOctave = 5,
         european = false,
+        displayNames = true,
     } = props;
 
     const simple = startingOctave === endingOctave;
 
+    const synth = new Synth().toDestination();
+
     const handleNotePress = (note: Note) => {
-        playNote(note.frequency, 500);
+        synth.triggerAttackRelease(noteName(note), '8n');
         onNotePress?.(note);
     };
 
@@ -88,7 +73,7 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
 
     useImperativeHandle(ref, () => ({
         playNote: (note: Note) => {
-            playNote(note.frequency, 500);
+            synth.triggerAttackRelease(noteName(note), '8n');
         },
     }));
 
@@ -104,7 +89,7 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                         note={note}
                         handleNotePress={handleNotePress}
                     >
-                        {noteName(note, { simple, european })}
+                        {displayNames && noteName(note, { simple, european })}
                     </NoteComponent>
                 ))}
             </Flex>

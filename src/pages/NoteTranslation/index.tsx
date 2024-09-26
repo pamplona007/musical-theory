@@ -1,4 +1,4 @@
-import { Button, Container, Flex, Text } from '@radix-ui/themes';
+import { Container, Flex, Text } from '@radix-ui/themes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Piano, { PianoRef } from 'src/components/Piano';
 import { filterNotes, Note, noteName } from 'src/utils';
@@ -7,9 +7,11 @@ const NoteTranslation = () => {
     const [currentNote, setCurrentNote] = useState<Note | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
     const [consecutiveSuccess, setConsecutiveSuccess] = useState<number>(0);
-    const [advanced, setAdvanced] = useState<boolean>(false);
 
     const pianoRef = useRef<PianoRef>(null);
+
+    const advanced = 5 <= consecutiveSuccess;
+    const superAdvanced = 10 <= consecutiveSuccess;
 
     const startingOctave = advanced ? 3: 4;
     const endingOctave = advanced ? 5 : 4;
@@ -35,17 +37,12 @@ const NoteTranslation = () => {
 
         if (noteName(note) !== noteName(currentNote)) {
             setSuccess(false);
-            setAdvanced(false);
             setConsecutiveSuccess(0);
             return;
         }
 
         setSuccess(true);
         setConsecutiveSuccess(consecutiveSuccess + 1);
-
-        if (5 <= consecutiveSuccess) {
-            setAdvanced(true);
-        }
 
         setTimeout(() => {
             setSuccess(false);
@@ -76,49 +73,39 @@ const NoteTranslation = () => {
                 height={'30vh'}
                 direction={'column'}
             >
-                {!currentNote && (
-                    <Button
-                        size={'4'}
-                        onClick={randomNote}
-                    >
-                        {'Começar'}
-                    </Button>
-                )}
-
                 {currentNote && (
-                    <button
-                        style={{
-                            border: 'none',
-                            background: 'none',
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => {
-                            pianoRef.current?.playNote(currentNote);
-                        }}
-                    >
+                    <>
+                        <button
+                            style={{
+                                border: 'none',
+                                background: 'none',
+                                cursor: 'pointer',
+                            }}
+                            onClick={() => {
+                                pianoRef.current?.playNote(currentNote);
+                            }}
+                        >
+                            <Text
+                                size={'9'}
+                                weight={'bold'}
+                                color={success ? 'green' : 'gray'}
+                            >
+                                {noteName(currentNote, {
+                                    simple: startingOctave === endingOctave,
+                                    european: true,
+                                })}
+                            </Text>
+                        </button>
                         <Text
-                            size={'9'}
+                            size={'4'}
                             weight={'bold'}
                             color={success ? 'green' : 'gray'}
                         >
-                            {noteName(currentNote, {
-                                simple: startingOctave === endingOctave,
-                                european: true,
-                            })}
+                            {consecutiveSuccess}
+                            {' '}
+                            {1 === consecutiveSuccess ? 'acerto' : 'acertos'}
                         </Text>
-                    </button>
-                )}
-
-                {currentNote && (
-                    <Text
-                        size={'4'}
-                        weight={'bold'}
-                        color={success ? 'green' : 'gray'}
-                    >
-                        {consecutiveSuccess}
-                        {' '}
-                        {1 === consecutiveSuccess ? 'acerto' : 'acertos'}
-                    </Text>
+                    </>
                 )}
             </Flex>
 
@@ -126,6 +113,7 @@ const NoteTranslation = () => {
                 onNotePress={onNotePress}
                 startingOctave={startingOctave}
                 endingOctave={endingOctave}
+                displayNames={!superAdvanced}
                 ref={pianoRef}
             />
         </Container>
