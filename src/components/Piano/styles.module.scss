@@ -1,0 +1,82 @@
+@use "sass:math";
+
+.piano-wrapper {
+    width: 100%;
+    padding-bottom: 15px;
+}
+
+$key-width: 60px;
+$black-key-width: $key-width * 0.6;
+$key-height: 180px;
+$black-key-height: $key-height * 0.6;
+
+
+.piano {
+
+    .key {
+        display: flex;
+        justify-content: center;
+        align-items: end;
+        font-size: .8rem;
+        padding-bottom: 5px;
+        width: $key-width;
+        text-align: center;
+        height: $key-height;
+        background: var(--focus-2);
+        border: 1px solid var(--gray-5);
+        cursor: pointer;
+
+        &:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        &:last-child {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        &:active {
+            animation: whiteKeyPress 0.5s;
+        }
+
+        &.sharp {
+            position: relative;
+            z-index: 1;
+
+            background: var(--focus-11);
+            color: var(--focus-1);
+
+            width: $black-key-width;
+            margin-left: -(math.div($black-key-width, 2));
+            margin-right: -(math.div($black-key-width, 2));
+            height: $black-key-height;
+            top: 0;
+
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+
+            &:active {
+                animation: blackKeyPress 0.5s;
+            }
+        }
+    }
+}
+
+@keyframes whiteKeyPress {
+    0% {
+        background: var(--focus-5);
+    }
+    100% {
+        background: var(--focus-1);
+    }
+}
+
+@keyframes blackKeyPress {
+    0% {
+        background: var(--focus-7);
+    }
+    100% {
+        background: var(--focus-11);
+    }
+}
