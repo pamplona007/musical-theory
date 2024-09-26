@@ -1,14 +1,16 @@
 import { Flex, Text, TextField } from '@radix-ui/themes';
 import { RootProps } from '@radix-ui/themes/src/components/text-field.js';
+import { ForwardedRef, forwardRef } from 'react';
 
 type InputProps = RootProps & {
-    label: string;
+    label?: string;
 };
 
-const Input = (props: InputProps) => {
+const Input = (props: InputProps, ref: ForwardedRef<HTMLInputElement>) => {
     const {
         label,
         size,
+        ...rest
     } = props;
 
     return (
@@ -25,11 +27,12 @@ const Input = (props: InputProps) => {
                 </Text>
                 <TextField.Root
                     size={size}
-                    {...props}
+                    ref={ref}
+                    {...rest}
                 />
             </Flex>
         </label>
     );
 };
 
-export default Input;
+export default forwardRef(Input);

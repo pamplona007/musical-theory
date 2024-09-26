@@ -41,6 +41,7 @@ const exercises = [
     {
         title: 'Distância entre notas',
         description: 'Diga a distância entre duas notas em tons e semitons',
+        path: '/note-distance',
     },
     {
         title: 'Intervalos',

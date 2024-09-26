@@ -1,6 +1,6 @@
 import { Flex, ScrollArea } from '@radix-ui/themes';
 import classNames from 'classnames';
-import { ForwardedRef, forwardRef, PropsWithChildren, useImperativeHandle, useRef } from 'react';
+import { ForwardedRef, forwardRef, PropsWithChildren, useImperativeHandle } from 'react';
 import { filterNotes, Note, noteName } from 'src/utils';
 import { Synth } from 'tone';
 
@@ -12,21 +12,31 @@ type PianoProps = {
     endingOctave?: number;
     european?: boolean;
     displayNames?: boolean;
+    activeNotes?: string[] | false;
 }
 
 export type PianoRef = {
-    playNote: (note: Note) => void;
+    playNote: (note: Note, timing?: string) => void;
 }
 
 type NoteComponentProps = {
     note: Note;
-    handleNotePress: (note: Note) => void;
+    handleNotePress?: (note: Note) => void;
+    active?: boolean;
+}
+
+function playNote(note: Note, timing = '8n') {
+    const synth = new Synth().toDestination();
+    synth.triggerAttackRelease(noteName(note), timing);
 }
 
 const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
-    const { note, handleNotePress, children } = props;
-
-    const preventFiring = useRef(false);
+    const {
+        note,
+        handleNotePress,
+        children,
+        active,
+    } = props;
 
     return (
         <button
@@ -35,15 +45,12 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
                 styles.key,
                 {
                     [styles.sharp]: note.isSharp,
+                    [styles.active]: active,
                 },
             )}
             onMouseDown={() => {
-                if (preventFiring.current) {
-                    preventFiring.current = false;
-                    return;
-                }
-
-                handleNotePress(note);
+                playNote(note);
+                handleNotePress?.(note);
             }}
         >
             {children}
@@ -58,23 +65,15 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
         endingOctave = 5,
         european = false,
         displayNames = true,
+        activeNotes = [],
     } = props;
 
     const simple = startingOctave === endingOctave;
 
-    const synth = new Synth().toDestination();
-
-    const handleNotePress = (note: Note) => {
-        synth.triggerAttackRelease(noteName(note), '8n');
-        onNotePress?.(note);
-    };
-
     const filteredNotes = filterNotes(startingOctave, endingOctave);
 
     useImperativeHandle(ref, () => ({
-        playNote: (note: Note) => {
-            synth.triggerAttackRelease(noteName(note), '8n');
-        },
+        playNote,
     }));
 
     return (
@@ -87,7 +86,8 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                     <NoteComponent
                         key={noteName(note)}
                         note={note}
-                        handleNotePress={handleNotePress}
+                        handleNotePress={onNotePress}
+                        active={activeNotes && activeNotes.includes(noteName(note))}
                     >
                         {displayNames && noteName(note, { simple, european })}
                     </NoteComponent>

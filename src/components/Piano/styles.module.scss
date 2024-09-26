@@ -40,6 +40,10 @@ $black-key-height: $key-height * 0.6;
             animation: whiteKeyPress 0.5s;
         }
 
+        &.active {
+            background: var(--focus-5);
+        }
+
         &.sharp {
             position: relative;
             z-index: 1;
@@ -58,6 +62,10 @@ $black-key-height: $key-height * 0.6;
 
             &:active {
                 animation: blackKeyPress 0.5s;
+            }
+
+            &.active {
+                background: var(--focus-7);
             }
         }
     }

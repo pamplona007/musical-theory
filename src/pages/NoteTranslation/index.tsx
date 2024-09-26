@@ -10,8 +10,9 @@ const NoteTranslation = () => {
 
     const pianoRef = useRef<PianoRef>(null);
 
-    const advanced = 5 <= consecutiveSuccess;
-    const superAdvanced = 10 <= consecutiveSuccess;
+    const beginner = 5 > consecutiveSuccess;
+    const advanced = 10 <= consecutiveSuccess;
+    const superAdvanced = 15 <= consecutiveSuccess;
 
     const startingOctave = advanced ? 3: 4;
     const endingOctave = advanced ? 5 : 4;
@@ -114,6 +115,7 @@ const NoteTranslation = () => {
                 startingOctave={startingOctave}
                 endingOctave={endingOctave}
                 displayNames={!superAdvanced}
+                activeNotes={currentNote && beginner ? [noteName(currentNote)] : []}
                 ref={pianoRef}
             />
         </Container>
