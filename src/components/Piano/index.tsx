@@ -1,6 +1,6 @@
-import { Flex, ScrollArea } from '@radix-ui/themes';
+import { Flex, Kbd, ScrollArea } from '@radix-ui/themes';
 import classNames from 'classnames';
-import { ForwardedRef, forwardRef, PropsWithChildren, useImperativeHandle } from 'react';
+import { ForwardedRef, forwardRef, PropsWithChildren, useEffect, useImperativeHandle, useState } from 'react';
 import { filterNotes, Note, noteName } from 'src/utils';
 import { Synth } from 'tone';
 
@@ -23,6 +23,7 @@ type NoteComponentProps = {
     note: Note;
     handleNotePress?: (note: Note) => void;
     active?: boolean;
+    keyboardKey?: string | false;
 }
 
 function playNote(note: Note, timing = '8n') {
@@ -30,13 +31,42 @@ function playNote(note: Note, timing = '8n') {
     synth.triggerAttackRelease(noteName(note), timing);
 }
 
+const keyboardKeys = ['a', 'w', 's', 'e', 'd', 'h', 'u', 'j', 'i', 'k', 'o', 'l'];
+
 const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
     const {
         note,
         handleNotePress,
         children,
-        active,
+        active: _active,
+        keyboardKey,
     } = props;
+
+    const [active, setActive] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === keyboardKey) {
+                playNote(note);
+                handleNotePress?.(note);
+                setActive(true);
+            }
+        };
+
+        const handleKeyUp = (event: KeyboardEvent) => {
+            if (event.key === keyboardKey) {
+                setActive(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [note, handleNotePress, keyboardKey]);
 
     return (
         <button
@@ -45,7 +75,7 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
                 styles.key,
                 {
                     [styles.sharp]: note.isSharp,
-                    [styles.active]: active,
+                    [styles.active]: active || _active,
                 },
             )}
             onMouseDown={() => {
@@ -53,6 +83,13 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
                 handleNotePress?.(note);
             }}
         >
+            {keyboardKey && (
+                <Kbd
+                    size={'2'}
+                >
+                    {keyboardKey}
+                </Kbd>
+            )}
             {children}
         </button>
     );
@@ -82,11 +119,12 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                 justify={'center'}
                 className={styles.piano}
             >
-                {filteredNotes.map((note) => (
+                {filteredNotes.map((note, index) => (
                     <NoteComponent
                         key={noteName(note)}
                         note={note}
                         handleNotePress={onNotePress}
+                        keyboardKey={simple && keyboardKeys[index]}
                         active={activeNotes && activeNotes.includes(noteName(note))}
                     >
                         {displayNames && noteName(note, { simple, european })}

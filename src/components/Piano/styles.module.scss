@@ -15,8 +15,10 @@ $black-key-height: $key-height * 0.6;
 
     .key {
         display: flex;
-        justify-content: center;
-        align-items: end;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        gap: 10px;
         font-size: .8rem;
         padding-bottom: 5px;
         width: $key-width;

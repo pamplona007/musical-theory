@@ -1,4 +1,4 @@
-import { Theme, ThemePanel } from '@radix-ui/themes';
+import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 import { RouterProvider } from 'react-router-dom';
 
@@ -14,7 +14,6 @@ const App = () => {
             scaling={'110%'}
         >
             <RouterProvider router={router} />
-            <ThemePanel defaultOpen={false} />
         </Theme>
     );
 };
