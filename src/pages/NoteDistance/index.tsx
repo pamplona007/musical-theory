@@ -1,5 +1,6 @@
 import { Box, Button, Container, Flex, Text } from '@radix-ui/themes';
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Input from 'src/components/Input';
 import Piano, { PianoRef } from 'src/components/Piano';
 import { filterNotes, noteName } from 'src/utils';
@@ -11,10 +12,9 @@ const NoteDistance = () => {
     const [consecutiveSuccess, setConsecutiveSuccess] = useState<number>(0);
     const [distanceValue, setDistanceValue] = useState<number>(0);
 
-    const inputRef = useRef<HTMLInputElement>(null);
+    const { t } = useTranslation();
 
-    const tonesNumber = Math.floor(distanceValue / 2);
-    const extraSemitones = distanceValue % 2;
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const beginner = 5 > consecutiveSuccess;
     const advanced = 10 <= consecutiveSuccess;
@@ -31,11 +31,12 @@ const NoteDistance = () => {
     const pianoRef = useRef<PianoRef>(null);
 
     const next = useCallback(() => {
-        const firstNoteIndex = Math.floor(Math.random() * filteredNotes.length);
-        const secondNoteIndex = Math.floor(Math.random() * (filteredNotes.length - firstNoteIndex)) + firstNoteIndex;
+        const firstNoteIndex = Math.floor(Math.random() * (filteredNotes.length * 0.75));
+        const secondNoteIndex = Math.floor(Math.random() * (filteredNotes.length - (firstNoteIndex + 1))) + firstNoteIndex;
 
         setFirstNoteIndex(firstNoteIndex);
         setSecondNoteIndex(null);
+
         setTimeout(() => {
             setSecondNoteIndex(secondNoteIndex);
         }, 1000);
@@ -55,17 +56,12 @@ const NoteDistance = () => {
         if (distance === Number(distanceValue)) {
             setSuccess(true);
             setConsecutiveSuccess(consecutiveSuccess + 1);
-
-            setTimeout(() => {
-                setSuccess(false);
-                next();
-            }, 1000);
             return;
         }
 
         setSuccess(false);
         setConsecutiveSuccess(0);
-    }, [firstNote, secondNote, secondNoteIndex, firstNoteIndex, consecutiveSuccess, next]);
+    }, [firstNote, secondNote, secondNoteIndex, firstNoteIndex, consecutiveSuccess]);
 
     useEffect(() => {
         if (!firstNote || !pianoRef.current) {
@@ -84,20 +80,11 @@ const NoteDistance = () => {
     }, [secondNote]);
 
     useEffect(() => {
-        next();
-    }, [next]);
-
-    const buildTonesString = (): string => {
-        let string = '';
-
-        string += `${tonesNumber} to${1 === tonesNumber ? 'm' : 'ns'}`;
-
-        if (extraSemitones) {
-            string += ` e ${extraSemitones} semitom${1 === extraSemitones ? '' : 's'}`;
-        }
-
-        return string;
-    };
+        setTimeout(() => {
+            setSuccess(false);
+            next();
+        }, 1000);
+    }, [next, consecutiveSuccess]);
 
     return (
         <Container>
@@ -167,9 +154,7 @@ const NoteDistance = () => {
                     weight={'bold'}
                     color={success ? 'green' : 'gray'}
                 >
-                    {consecutiveSuccess}
-                    {' '}
-                    {1 === consecutiveSuccess ? 'acerto' : 'acertos'}
+                    {t('hits', { count: consecutiveSuccess })}
                 </Text>
             </Flex>
 
@@ -189,8 +174,8 @@ const NoteDistance = () => {
                         gap={'3'}
                     >
                         <Input
-                            type={'text'}
-                            placeholder={'Distância em semitons'}
+                            type={'number'}
+                            placeholder={t('distance_in_semitones')}
                             ref={inputRef}
                             onChange={(event) => {
                                 setDistanceValue(Number(event.target.value));
@@ -200,11 +185,14 @@ const NoteDistance = () => {
                         <Button
                             type={'submit'}
                         >
-                            {'Confirmar'}
+                            {t('confirm')}
                         </Button>
                     </Flex>
                     <Text>
-                        {buildTonesString()}
+                        {t('tones_and_semitones', {
+                            tones: Math.floor(distanceValue / 2),
+                            semitones: distanceValue % 2,
+                        })}
                     </Text>
                 </Flex>
             </form>

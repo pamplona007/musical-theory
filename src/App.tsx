@@ -7,7 +7,12 @@ import router from './routes';
 
 const App = () => {
     return (
-        <Theme appearance={'light'} accentColor={'purple'} radius={'full'} scaling={'110%'}>
+        <Theme
+            appearance={localStorage.getItem('appearance') as 'light' | 'dark' | undefined || 'light'}
+            accentColor={'purple'}
+            radius={'full'}
+            scaling={'110%'}
+        >
             <RouterProvider router={router} />
             <ThemePanel defaultOpen={false} />
         </Theme>

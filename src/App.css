@@ -11,4 +11,6 @@ body {
 
 * {
   box-sizing: border-box;
+  transition-property: background-color;
+  transition-duration: 200ms;
 }

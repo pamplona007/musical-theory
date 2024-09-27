@@ -1,5 +1,6 @@
 import { Container, Flex, Text } from '@radix-ui/themes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Piano, { PianoRef } from 'src/components/Piano';
 import { filterNotes, Note, noteName } from 'src/utils';
 
@@ -7,6 +8,8 @@ const NoteTranslation = () => {
     const [currentNote, setCurrentNote] = useState<Note | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
     const [consecutiveSuccess, setConsecutiveSuccess] = useState<number>(0);
+
+    const { t } = useTranslation();
 
     const pianoRef = useRef<PianoRef>(null);
 
@@ -102,9 +105,7 @@ const NoteTranslation = () => {
                             weight={'bold'}
                             color={success ? 'green' : 'gray'}
                         >
-                            {consecutiveSuccess}
-                            {' '}
-                            {1 === consecutiveSuccess ? 'acerto' : 'acertos'}
+                            {t('hits', { count: consecutiveSuccess })}
                         </Text>
                     </>
                 )}

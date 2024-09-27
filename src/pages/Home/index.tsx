@@ -1,5 +1,6 @@
 import { Card, Container, Grid, Heading, Text } from '@radix-ui/themes';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import Link from 'src/components/Link';
 
 import styles from './styles.module.scss';
@@ -11,6 +12,8 @@ type Exercise = {
 };
 
 const ExerciseCard = ({ exercise, disabled = false }: { exercise: Exercise, disabled?: boolean }) => {
+    const { t } = useTranslation();
+
     const classes = classNames(
         styles['exercise-card'],
         {
@@ -23,10 +26,10 @@ const ExerciseCard = ({ exercise, disabled = false }: { exercise: Exercise, disa
             className={classes}
         >
             <Heading>
-                {exercise.title}
+                {t(exercise.title)}
             </Heading>
             <Text>
-                {exercise.description}
+                {t(exercise.description)}
             </Text>
         </Card>
     );
@@ -34,22 +37,22 @@ const ExerciseCard = ({ exercise, disabled = false }: { exercise: Exercise, disa
 
 const exercises = [
     {
-        title: 'Nome das notas',
-        description: 'Vamos praticar o nome das notas musicais',
+        title: 'card.note_names.title',
+        description: 'card.note_names.description',
         path: '/note-translation',
     },
     {
-        title: 'Distância entre notas',
-        description: 'Diga a distância entre duas notas em tons e semitons',
+        title: 'card.note_distances.title',
+        description: 'card.note_distances.description',
         path: '/note-distance',
     },
     {
-        title: 'Intervalos',
-        description: 'Vamos praticar a identificação de intervalos musicais',
+        title: 'card.note_intervals.title',
+        description: 'card.note_intervals.description',
     },
     {
-        title: 'Leitura de partituras',
-        description: 'Pratique a leitura de partituras identificando notas',
+        title: 'card.note_read.title',
+        description: 'card.note_read.description',
     },
 ];
 
