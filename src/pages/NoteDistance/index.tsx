@@ -25,8 +25,8 @@ const NoteDistance = () => {
 
     const filteredNotes = useMemo(() => filterNotes(startingOctave, endingOctave), [startingOctave, endingOctave]);
 
-    const firstNote = (firstNoteIndex || 0 === firstNoteIndex) && filteredNotes[firstNoteIndex];
-    const secondNote = (secondNoteIndex || 0 === secondNoteIndex) && filteredNotes[secondNoteIndex];
+    const firstNote = (firstNoteIndex || 0 === firstNoteIndex) ? filteredNotes[firstNoteIndex] : undefined;
+    const secondNote = (secondNoteIndex || 0 === secondNoteIndex) ? filteredNotes[secondNoteIndex] : undefined;
 
     const pianoRef = useRef<PianoRef>(null);
 
@@ -45,7 +45,7 @@ const NoteDistance = () => {
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!firstNote || !secondNote || !inputRef.current) {
+        if (!firstNoteIndex || !secondNoteIndex || !inputRef.current) {
             return;
         }
 
@@ -61,7 +61,7 @@ const NoteDistance = () => {
 
         setSuccess(false);
         setConsecutiveSuccess(0);
-    }, [firstNote, secondNote, secondNoteIndex, firstNoteIndex, consecutiveSuccess]);
+    }, [secondNoteIndex, firstNoteIndex, consecutiveSuccess]);
 
     useEffect(() => {
         if (!firstNote || !pianoRef.current) {
@@ -206,7 +206,7 @@ const NoteDistance = () => {
                     startingOctave={startingOctave}
                     endingOctave={endingOctave}
                     displayNames={!superAdvanced}
-                    activeNotes={beginner && [firstNote && noteName(firstNote), secondNote && noteName(secondNote)].filter(Boolean) as string[]}
+                    activeNotes={beginner && [firstNote?.id, secondNote?.id].filter(Boolean) as string[]}
                     ref={pianoRef}
                 />
             </Box>

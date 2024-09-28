@@ -1,4 +1,5 @@
 export type Note = {
+    id: string;
     name: string;
     european: string;
     frequency: number;
@@ -21,7 +22,15 @@ export const getNotes = (): Note[] => {
             const european = europeanNames[i];
             const isSharp = name.includes('#');
             const frequency = getAudioFrequency(i + (octave * 12) - 9); // A0 is 27.5Hz and C0 is 16.35Hz
-            notes.push({ name: name.replace('#', ''), european, frequency, octave, isSharp });
+
+            notes.push({
+                id: `${name}${isSharp ? '#' : ''}${octave}`,
+                name,
+                european,
+                frequency,
+                octave,
+                isSharp,
+            });
         }
     }
 

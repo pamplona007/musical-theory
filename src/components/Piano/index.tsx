@@ -1,7 +1,7 @@
 import { Flex, Kbd, ScrollArea } from '@radix-ui/themes';
 import classNames from 'classnames';
 import { ForwardedRef, forwardRef, PropsWithChildren, useEffect, useImperativeHandle, useState } from 'react';
-import { filterNotes, Note, noteName } from 'src/utils';
+import { filterNotes, Note, noteName, notes } from 'src/utils';
 import { Synth } from 'tone';
 
 import styles from './styles.module.scss';
@@ -28,7 +28,7 @@ type NoteComponentProps = {
 
 function playNote(note: Note, timing = '8n') {
     const synth = new Synth().toDestination();
-    synth.triggerAttackRelease(noteName(note), timing);
+    synth.triggerAttackRelease(note.id, timing);
 }
 
 const keyboardKeys = ['a', 'w', 's', 'e', 'd', 'h', 'u', 'j', 'i', 'k', 'o', 'l'];
@@ -41,6 +41,8 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
         active: _active,
         keyboardKey,
     } = props;
+
+    console.log(notes);
 
     const [active, setActive] = useState(false);
 
@@ -70,7 +72,6 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
 
     return (
         <button
-            key={noteName(note)}
             className={classNames(
                 styles.key,
                 {
@@ -121,11 +122,11 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
             >
                 {filteredNotes.map((note, index) => (
                     <NoteComponent
-                        key={noteName(note)}
+                        key={note.id}
                         note={note}
                         handleNotePress={onNotePress}
                         keyboardKey={simple && keyboardKeys[index]}
-                        active={activeNotes && activeNotes.includes(noteName(note))}
+                        active={activeNotes && activeNotes.includes(note.id)}
                     >
                         {displayNames && noteName(note, { simple, european })}
                     </NoteComponent>

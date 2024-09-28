@@ -26,7 +26,7 @@ const NoteTranslation = () => {
         setCurrentNote((currentNote) => {
             let randomIndex;
 
-            while (randomIndex === undefined || noteName(filteredNotes[randomIndex]) === (currentNote && noteName(currentNote))) {
+            while (randomIndex === undefined || filteredNotes[randomIndex].id === currentNote?.id) {
                 randomIndex = Math.floor(Math.random() * filteredNotes.length);
             }
 
@@ -39,7 +39,7 @@ const NoteTranslation = () => {
             return;
         }
 
-        if (noteName(note) !== noteName(currentNote)) {
+        if (note.id !== currentNote.id) {
             setSuccess(false);
             setConsecutiveSuccess(0);
             return;
@@ -116,7 +116,7 @@ const NoteTranslation = () => {
                 startingOctave={startingOctave}
                 endingOctave={endingOctave}
                 displayNames={!superAdvanced}
-                activeNotes={currentNote && beginner ? [noteName(currentNote)] : []}
+                activeNotes={currentNote && beginner ? [currentNote.id] : []}
                 ref={pianoRef}
             />
         </Container>
