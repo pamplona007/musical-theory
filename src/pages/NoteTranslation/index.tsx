@@ -1,4 +1,4 @@
-import { Container, Flex, Text } from '@radix-ui/themes';
+import { Flex, Text } from '@radix-ui/themes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Piano, { PianoRef } from 'src/components/Piano';
@@ -70,7 +70,7 @@ const NoteTranslation = () => {
     }, [randomNote, success]);
 
     return (
-        <Container>
+        <>
             <Flex
                 justify={'center'}
                 align={'center'}
@@ -119,7 +119,7 @@ const NoteTranslation = () => {
                 activeNotes={currentNote && beginner ? [currentNote.id] : []}
                 ref={pianoRef}
             />
-        </Container>
+        </>
     );
 };
 

@@ -1,4 +1,4 @@
-import { Box, Button, Container, Flex, Text } from '@radix-ui/themes';
+import { Box, Button, Flex, Text } from '@radix-ui/themes';
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Input from 'src/components/Input';
@@ -87,15 +87,14 @@ const NoteDistance = () => {
     }, [next, consecutiveSuccess]);
 
     return (
-        <Container>
+        <>
             <Flex
                 justify={'center'}
                 align={'center'}
-                mt={'15vh'}
+                mt={'5vh'}
                 mb={'8'}
                 direction={'column'}
             >
-
                 <Flex
                     align={'center'}
                     gap={'5'}
@@ -210,7 +209,7 @@ const NoteDistance = () => {
                     ref={pianoRef}
                 />
             </Box>
-        </Container>
+        </>
     );
 };
 

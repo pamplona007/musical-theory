@@ -29,13 +29,13 @@ const LayoutApp = () => {
                 <Flex
                     gap={'15px'}
                 >
-                    <a href={'https://github.com/pamplona007/musical-theory'} target={'_blank'}>
+                    <Link href={'https://github.com/pamplona007/musical-theory'} target={'_blank'}>
                         <IconButton
                             variant={'ghost'}
                         >
                             <IconBrandGithub />
                         </IconButton>
-                    </a>
+                    </Link>
                     <IconButton
                         variant={'ghost'}
                         onClick={() => {
@@ -89,9 +89,15 @@ const LayoutApp = () => {
                 >
                     <Text
                         size={'1'}
+                        color={'gray'}
                     >
                         {'Made with ❤️ by '}
-                        <Link href={'https://github.com/pamplona007'} target={'_blank'}>{'Lucas Pamplona'}</Link>
+                        <Link
+                            href={'https://github.com/pamplona007'}
+                            target={'_blank'}
+                        >
+                            {'Lucas Pamplona'}
+                        </Link>
                     </Text>
                 </Flex>
             </footer>
