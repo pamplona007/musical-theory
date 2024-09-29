@@ -1,5 +1,5 @@
-import { Box, DropdownMenu, Flex, IconButton, useThemeContext } from '@radix-ui/themes';
-import { IconHome, IconMoon, IconSun, IconWorld } from '@tabler/icons-react';
+import { Box, DropdownMenu, Flex, IconButton, Link, Text, useThemeContext } from '@radix-ui/themes';
+import { IconBrandGithub, IconHome, IconMoon, IconSun, IconWorld } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { languages } from 'src/translations/i18n';
@@ -29,6 +29,13 @@ const LayoutApp = () => {
                 <Flex
                     gap={'15px'}
                 >
+                    <a href={'https://github.com/pamplona007/musical-theory'} target={'_blank'}>
+                        <IconButton
+                            variant={'ghost'}
+                        >
+                            <IconBrandGithub />
+                        </IconButton>
+                    </a>
                     <IconButton
                         variant={'ghost'}
                         onClick={() => {
@@ -69,10 +76,25 @@ const LayoutApp = () => {
                 </Flex>
             </Flex>
             <Box
+                minHeight={'calc(100vh - 150px)'}
                 p={'20px'}
             >
                 <Outlet />
             </Box>
+            <footer>
+                <Flex
+                    height={'50px'}
+                    justify={'center'}
+                    align={'center'}
+                >
+                    <Text
+                        size={'1'}
+                    >
+                        {'Made with ❤️ by '}
+                        <Link href={'https://github.com/pamplona007'} target={'_blank'}>{'Lucas Pamplona'}</Link>
+                    </Text>
+                </Flex>
+            </footer>
         </>
     );
 };
