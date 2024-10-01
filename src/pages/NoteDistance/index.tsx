@@ -1,9 +1,9 @@
 import { Box, Button, Flex, Text } from '@radix-ui/themes';
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Input from 'src/components/Input';
 import Piano, { PianoRef } from 'src/components/Piano';
-import { filterNotes, noteName } from 'src/utils';
+import { noteName } from 'src/utils';
 
 const NoteDistance = () => {
     const [firstNoteIndex, setFirstNoteIndex] = useState<number | null>(null);
@@ -15,6 +15,7 @@ const NoteDistance = () => {
     const { t } = useTranslation();
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const pianoRef = useRef<PianoRef>(null);
 
     const beginner = 5 > consecutiveSuccess;
     const advanced = 10 <= consecutiveSuccess;
@@ -23,29 +24,31 @@ const NoteDistance = () => {
     const startingOctave = advanced ? 3: 4;
     const endingOctave = advanced ? 5 : 4;
 
-    const filteredNotes = useMemo(() => filterNotes(startingOctave, endingOctave), [startingOctave, endingOctave]);
-
-    const firstNote = (firstNoteIndex || 0 === firstNoteIndex) ? filteredNotes[firstNoteIndex] : undefined;
-    const secondNote = (secondNoteIndex || 0 === secondNoteIndex) ? filteredNotes[secondNoteIndex] : undefined;
-
-    const pianoRef = useRef<PianoRef>(null);
+    const firstNote = (firstNoteIndex || 0 === firstNoteIndex) ? pianoRef.current?.availableNotes[firstNoteIndex] : undefined;
+    const secondNote = (secondNoteIndex || 0 === secondNoteIndex) ? pianoRef.current?.availableNotes[secondNoteIndex] : undefined;
 
     const next = useCallback(() => {
-        const firstNoteIndex = Math.floor(Math.random() * (filteredNotes.length * 0.75));
-        const secondNoteIndex = Math.floor(Math.random() * (filteredNotes.length - (firstNoteIndex + 1))) + firstNoteIndex;
+        if (!pianoRef.current) {
+            return;
+        }
+
+        const firstNoteIndex = Math.floor(Math.random() * (pianoRef.current.availableNotes.length * 0.75));
+        const secondNoteIndex = Math.floor(Math.random() * (pianoRef.current.availableNotes.length - (firstNoteIndex + 1))) + firstNoteIndex;
 
         setFirstNoteIndex(firstNoteIndex);
+        pianoRef.current.playNote(pianoRef.current.availableNotes[firstNoteIndex]);
         setSecondNoteIndex(null);
 
         setTimeout(() => {
             setSecondNoteIndex(secondNoteIndex);
+            pianoRef.current?.playNote(pianoRef.current.availableNotes[secondNoteIndex]);
         }, 1000);
-    }, [filteredNotes]);
+    }, []);
 
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!firstNoteIndex || !secondNoteIndex || !inputRef.current) {
+        if ((null === firstNoteIndex) || (null === secondNoteIndex) || !inputRef.current || success) {
             return;
         }
 
@@ -56,35 +59,19 @@ const NoteDistance = () => {
         if (distance === Number(distanceValue)) {
             setSuccess(true);
             setConsecutiveSuccess(consecutiveSuccess + 1);
+            setDistanceValue(0);
+
+            setTimeout(() => {
+                next();
+                setSuccess(false);
+            }, 1000);
+
             return;
         }
 
         setSuccess(false);
         setConsecutiveSuccess(0);
-    }, [secondNoteIndex, firstNoteIndex, consecutiveSuccess]);
-
-    useEffect(() => {
-        if (!firstNote || !pianoRef.current) {
-            return;
-        }
-
-        pianoRef.current.playNote(firstNote);
-    }, [firstNote]);
-
-    useEffect(() => {
-        if (!secondNote || !pianoRef.current) {
-            return;
-        }
-
-        pianoRef.current.playNote(secondNote);
-    }, [secondNote]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setSuccess(false);
-            next();
-        }, 1000);
-    }, [next, consecutiveSuccess]);
+    }, [firstNoteIndex, secondNoteIndex, success, consecutiveSuccess, next]);
 
     return (
         <>
@@ -92,13 +79,24 @@ const NoteDistance = () => {
                 justify={'center'}
                 align={'center'}
                 mt={'5vh'}
-                mb={'8'}
+                mb={'9'}
                 direction={'column'}
             >
                 <Flex
                     align={'center'}
                     gap={'5'}
+                    mb={'2'}
+                    height={'70px'}
                 >
+                    {!firstNote && (
+                        <Button
+                            onClick={next}
+                            size={'4'}
+                        >
+                            {t('start')}
+                        </Button>
+                    )}
+
                     {firstNote && (
                         <button
                             style={{
@@ -200,6 +198,7 @@ const NoteDistance = () => {
                 style={{
                     opacity: 1 - (0.2 * (consecutiveSuccess - 10)),
                 }}
+                mt={'9'}
             >
                 <Piano
                     startingOctave={startingOctave}

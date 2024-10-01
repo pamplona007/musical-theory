@@ -19,6 +19,7 @@ export type PianoRef = {
     playNote: (note: Note, timing?: string) => void;
     attackNote: (note: Note) => void;
     releaseNote: (note: Note) => void;
+    availableNotes: Note[];
 }
 
 type NoteComponentProps = {
@@ -123,6 +124,8 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
 
     const [activeNotes, setActiveNotes] = useState<string[]>([]);
 
+    const filteredNotes = filterNotes(startingOctave, endingOctave);
+
     const refValue: PianoRef = useMemo(() => ({
         playNote: (note, timing = '8n') => {
             synth.triggerAttackRelease(note.id, timing);
@@ -139,12 +142,12 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
             setActiveNotes(activeNotes.filter((id) => id !== note.id));
             synth.triggerRelease(note.id);
         },
-    }), [activeNotes]);
+        availableNotes: filteredNotes,
+    }), [activeNotes, filteredNotes]);
 
     useImperativeHandle(ref, () => refValue);
 
     const simple = startingOctave === endingOctave;
-    const filteredNotes = filterNotes(startingOctave, endingOctave);
 
     return (
         <PianoContext.Provider value={refValue}>
