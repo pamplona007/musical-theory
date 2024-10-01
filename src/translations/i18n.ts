@@ -11,6 +11,10 @@ export const languages = [
         id: 'en',
         name: 'English',
     },
+    {
+        id: 'fr',
+        name: 'Français',
+    },
 ];
 
 const resources = {
@@ -84,6 +88,42 @@ const resources = {
             'scale.blues': 'Blues',
             'scale.whole_tone': 'Whole Tone',
             'scale.diminished': 'Diminished',
+        },
+    },
+    fr: {
+        translation: {
+            'tone_one': '{{count}} ton',
+            'tone_other': '{{count}} tons',
+            'semitone_one': '{{count}} demi-ton',
+            'semitone_other': '{{count}} demi-tons',
+            'hits_zero': '{{count}} hits',
+            'hits_one': '{{count}} hit',
+            'hits_other': '{{count}} hits',
+            'tones_and_semitones': '$t(tone, {"count": {{tones}} }) et $t(semitone, {"count": {{semitones}} })',
+            'distance_in_semitones': 'Distance en demi-tons',
+            'confirm': 'Confirmer',
+            'start': 'Démarrer',
+
+            'card.note_names.title': 'Noms des notes',
+            'card.note_names.description': 'Pratiquons les noms des notes de musique',
+            'card.note_distances.title': 'Distances entre les notes',
+            'card.note_distances.description': 'Dites la distance entre deux notes en tons et demi-tons',
+            'card.note_intervals.title': 'Intervalles',
+            'card.note_intervals.description': 'Pratiquons l\'identification des intervalles musicaux',
+            'card.note_read.title': 'Lecture de partitions',
+            'card.note_read.description': 'Pratiquez la lecture de partitions en identifiant les notes',
+            'card.scales.title': 'Gammes',
+            'card.scales.description': 'Pratiquez la construction de gammes musicales',
+
+            'scale.major': 'Majeur',
+            'scale.minor': 'Mineur',
+            'scale.harmonic_minor': 'Mineur Harmonique',
+            'scale.melodic_minor': 'Mineur Mélodique',
+            'scale.pentatonic_major': 'Pentatonique Majeure',
+            'scale.pentatonic_minor': 'Pentatonique Mineure',
+            'scale.blues': 'Blues',
+            'scale.whole_tone': 'Tons Entiers',
+            'scale.diminished': 'Diminuée',
         },
     },
 };
