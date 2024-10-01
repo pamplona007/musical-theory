@@ -1,4 +1,5 @@
-import { Flex, Kbd, ScrollArea } from '@radix-ui/themes';
+import { Box, Flex, IconButton, Kbd, ScrollArea, Slider } from '@radix-ui/themes';
+import { IconVolume, IconVolumeOff } from '@tabler/icons-react';
 import classNames from 'classnames';
 import { createContext, ForwardedRef, forwardRef, PropsWithChildren, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { filterNotes, Note, noteName } from 'src/utils';
@@ -133,8 +134,10 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
     } = props;
 
     const [activeNotes, setActiveNotes] = useState<string[]>([]);
+    const [volume, setVolume] = useState(Number(localStorage.getItem('pianoVolume') || 0));
 
     const filteredNotes = filterNotes(startingOctave, endingOctave);
+    const isMuted = -50 === volume;
 
     const refValue: PianoRef = useMemo(() => ({
         playNote: (note, timing = '8n') => {
@@ -159,6 +162,15 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
 
     const simple = startingOctave === endingOctave;
 
+    useEffect(() => {
+        synth.volume.value = volume;
+        localStorage.setItem('pianoVolume', volume.toString());
+
+        if (!isMuted) {
+            localStorage.setItem('unmutedPianoVolume', volume.toString());
+        }
+    }, [isMuted, volume]);
+
     return (
         <PianoContext.Provider value={refValue}>
             <ScrollArea className={styles['piano-wrapper']}>
@@ -181,6 +193,38 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                     ))}
                 </Flex>
             </ScrollArea>
+            <Flex
+                justify={'center'}
+                align={'center'}
+                gap={'5'}
+                mt={'3'}
+            >
+                <IconButton
+                    variant={'ghost'}
+                    onClick={() => setVolume(isMuted ? Number(localStorage.getItem('unmutedPianoVolume')) : -50)}
+                >
+                    {-50 === volume
+                        ? (
+                            <IconVolumeOff />
+                        )
+                        : (
+                            <IconVolume />
+                        )}
+                </IconButton>
+                <Box
+                    maxWidth={'200px'}
+                    width={'100%'}
+                >
+                    <Slider
+                        defaultValue={[50]}
+                        max={0}
+                        min={-50}
+                        onValueChange={(value) => setVolume(value[0])}
+                        value={[volume]}
+                        size={'1'}
+                    />
+                </Box>
+            </Flex>
         </PianoContext.Provider>
     );
 };
