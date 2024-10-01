@@ -4,6 +4,7 @@ import GuitarTest from 'src/pages/GuitarTest';
 import Home from 'src/pages/Home';
 import NoteDistance from 'src/pages/NoteDistance';
 import NoteTranslation from 'src/pages/NoteTranslation';
+import Scales from 'src/pages/Scales';
 
 export const appRoutes: RouteObject[] = [
     {
@@ -17,6 +18,14 @@ export const appRoutes: RouteObject[] = [
     {
         path: '/note-distance',
         element: <NoteDistance />,
+    },
+    {
+        path: '/note-distance',
+        element: <NoteDistance />,
+    },
+    {
+        path: '/scales',
+        element: <Scales />,
     },
     {
         path: '/guitar-test',

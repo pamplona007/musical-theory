@@ -58,3 +58,73 @@ export const noteName = (note: Note, options?: { simple?: boolean; european?:boo
         !simple && note.octave,
     ].filter(Boolean).join('');
 };
+
+export const scales = [
+    {
+        name: 'major',
+        notes: [2, 2, 1, 2, 2, 2, 1],
+    },
+    {
+        name: 'minor',
+        notes: [2, 1, 2, 2, 1, 2, 2],
+    },
+    {
+        name: 'harmonic_minor',
+        notes: [2, 1, 2, 2, 1, 3, 1],
+    },
+    {
+        name: 'melodic_minor',
+        notes: [2, 1, 2, 2, 2, 2, 1],
+    },
+    {
+        name: 'pentatonic_major',
+        notes: [2, 2, 3, 2, 3],
+    },
+    {
+        name: 'pentatonic_minor',
+        notes: [3, 2, 2, 3, 2],
+    },
+    {
+        name: 'blues',
+        notes: [3, 2, 1, 1, 3, 2],
+    },
+    {
+        name: 'whole_tone',
+        notes: [2, 2, 2, 2, 2, 2],
+    },
+    {
+        name: 'diminished',
+        notes: [1, 2, 1, 2, 1, 2, 1, 2],
+    },
+];
+
+export const getScale = (note: Note, scale: string, options?: { ascending?: boolean, octaves?: number }) => {
+    const scaleConfig = scales.find(({ name }) => name === scale);
+
+    if (!scaleConfig) {
+        return [];
+    }
+
+    const { ascending = true, octaves = 1 } = options || {};
+    const scaleNotes: Note[] = [note];
+    let currentNoteIndex = notes.findIndex((n) => n.id === note.id);
+
+    if (-1 === currentNoteIndex) {
+        return [];
+    }
+
+    for (let octave = 0; octave < octaves; octave++) {
+        for (const interval of scaleConfig.notes) {
+            currentNoteIndex += ascending ? interval : -interval;
+            scaleNotes.push(notes[currentNoteIndex]);
+
+            if (currentNoteIndex >= notes.length || 0 > currentNoteIndex) {
+                break;
+            }
+        }
+    }
+
+    scaleNotes.pop();
+
+    return scaleNotes;
+};

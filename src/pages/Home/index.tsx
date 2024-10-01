@@ -47,6 +47,11 @@ const exercises = [
         path: '/note-distance',
     },
     {
+        title: 'card.scales.title',
+        description: 'card.scales.description',
+        path: '/scales',
+    },
+    {
         title: 'card.note_intervals.title',
         description: 'card.note_intervals.description',
     },

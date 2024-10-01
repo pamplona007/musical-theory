@@ -42,6 +42,14 @@ $black-key-height: $key-height * 0.6;
             background: var(--focus-5);
         }
 
+        &.success {
+            background: var(--green-5);
+        }
+
+        &.error {
+            background: var(--red-5);
+        }
+
         &.sharp {
             position: relative;
             z-index: 1;
@@ -60,6 +68,14 @@ $black-key-height: $key-height * 0.6;
 
             &.active {
                 background: var(--focus-7);
+            }
+
+            &.success {
+                background: var(--green-11);
+            }
+
+            &.error {
+                background: var(--red-11);
             }
         }
     }

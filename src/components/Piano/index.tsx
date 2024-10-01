@@ -13,6 +13,8 @@ export type PianoProps = {
     european?: boolean;
     displayNames?: boolean;
     activeNotes?: string[] | false;
+    successNotes?: string[];
+    errorNotes?: string[];
 }
 
 export type PianoRef = {
@@ -27,6 +29,8 @@ type NoteComponentProps = {
     handleNotePress?: (note: Note) => void;
     active?: boolean;
     keyboardKey?: string | false;
+    success?: boolean;
+    error?: boolean;
 }
 
 const keyboardKeys = ['a', 'w', 's', 'e', 'd', 'h', 'u', 'j', 'i', 'k', 'o', 'l'];
@@ -40,6 +44,8 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
         children,
         active,
         keyboardKey,
+        success,
+        error,
     } = props;
 
     const isTouchDevice = 'ontouchstart' in window || 0 < navigator.maxTouchPoints;
@@ -93,6 +99,8 @@ const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
                 {
                     [styles.sharp]: note.isSharp,
                     [styles.active]: active,
+                    [styles.success]: success,
+                    [styles.error]: error,
                 },
             )}
             onMouseLeave={() => releaseThisNote()}
@@ -120,6 +128,8 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
         european = false,
         displayNames = true,
         activeNotes: externallyActiveNotes,
+        successNotes,
+        errorNotes,
     } = props;
 
     const [activeNotes, setActiveNotes] = useState<string[]>([]);
@@ -163,6 +173,8 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                             handleNotePress={onNotePress}
                             keyboardKey={simple && keyboardKeys[index]}
                             active={activeNotes.includes(note.id) || (externallyActiveNotes && externallyActiveNotes.includes(note.id))}
+                            success={successNotes?.includes(note.id)}
+                            error={errorNotes?.includes(note.id)}
                         >
                             {displayNames && noteName(note, { simple, european })}
                         </NoteComponent>
