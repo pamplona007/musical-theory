@@ -15,8 +15,8 @@ export type PianoProps = {
     european?: boolean;
     displayNames?: boolean;
     activeNotes?: string[] | false;
-    successNotes?: string[];
-    errorNotes?: string[];
+    successNotes?: string[] | false;
+    errorNotes?: string[] | false;
 }
 
 export type PianoRef = {
@@ -193,8 +193,8 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                             handleNotePress={onNotePress}
                             keyboardKey={simple && keyboardKeys[index]}
                             active={activeNotes.includes(note) || (externallyActiveNotes && externallyActiveNotes.includes(note.id))}
-                            success={successNotes?.includes(note.id)}
-                            error={errorNotes?.includes(note.id)}
+                            success={successNotes && successNotes.includes(note.id)}
+                            error={errorNotes && errorNotes.includes(note.id)}
                         >
                             {displayNames && noteName(note, { simple })}
                         </NoteComponent>

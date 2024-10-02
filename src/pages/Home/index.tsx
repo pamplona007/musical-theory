@@ -70,7 +70,7 @@ const Home = () => {
                     initial: '1fr',
                     md: 'repeat(2, 1fr)',
                 }}
-                gap={'2'}
+                gap={'5'}
                 justify={'center'}
             >
                 {exercises.map((exercise, index) => exercise.path

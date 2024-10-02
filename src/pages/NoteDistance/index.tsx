@@ -3,26 +3,31 @@ import { FormEvent, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Input from 'src/components/Input';
 import Piano, { PianoRef } from 'src/components/Piano';
+import useLeveling from 'src/hooks/useLeveling';
 import { noteName } from 'src/utils';
 
 const NoteDistance = () => {
     const [firstNoteIndex, setFirstNoteIndex] = useState<number | null>(null);
     const [secondNoteIndex, setSecondNoteIndex] = useState<number | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
-    const [consecutiveSuccess, setConsecutiveSuccess] = useState<number>(0);
     const [distanceValue, setDistanceValue] = useState<number>(0);
+
+    const {
+        consecutiveSuccess,
+        personalBest,
+        level,
+        update,
+    } = useLeveling({
+        localStorageKey: 'note-distance-level',
+    });
 
     const { t } = useTranslation();
 
     const inputRef = useRef<HTMLInputElement>(null);
     const pianoRef = useRef<PianoRef>(null);
 
-    const beginner = 5 > consecutiveSuccess;
-    const advanced = 10 <= consecutiveSuccess;
-    const superAdvanced = 15 <= consecutiveSuccess;
-
-    const startingOctave = advanced ? 3: 4;
-    const endingOctave = advanced ? 5 : 4;
+    const startingOctave = 2 <= level ? 3: 4;
+    const endingOctave = 2 <= level ? 5 : 4;
 
     const firstNote = (firstNoteIndex || 0 === firstNoteIndex) ? pianoRef.current?.availableNotes[firstNoteIndex] : undefined;
     const secondNote = (secondNoteIndex || 0 === secondNoteIndex) ? pianoRef.current?.availableNotes[secondNoteIndex] : undefined;
@@ -58,20 +63,20 @@ const NoteDistance = () => {
 
         if (distance === Number(distanceValue)) {
             setSuccess(true);
-            setConsecutiveSuccess(consecutiveSuccess + 1);
             setDistanceValue(0);
 
             setTimeout(() => {
                 next();
                 setSuccess(false);
+                update(true);
             }, 1000);
 
             return;
         }
 
+        update(false);
         setSuccess(false);
-        setConsecutiveSuccess(0);
-    }, [firstNoteIndex, secondNoteIndex, success, consecutiveSuccess, next]);
+    }, [firstNoteIndex, secondNoteIndex, success, update, next]);
 
     return (
         <>
@@ -144,12 +149,20 @@ const NoteDistance = () => {
                     )}
                 </Flex>
 
+                {firstNote && (
+                    <Text
+                        size={'4'}
+                        weight={'bold'}
+                        color={success ? 'green' : 'gray'}
+                    >
+                        {t('hits', { count: consecutiveSuccess })}
+                    </Text>
+                )}
                 <Text
-                    size={'4'}
-                    weight={'bold'}
+                    size={'2'}
                     color={success ? 'green' : 'gray'}
                 >
-                    {t('hits', { count: consecutiveSuccess })}
+                    {t('personal_best', { count: personalBest })}
                 </Text>
             </Flex>
 
@@ -201,8 +214,9 @@ const NoteDistance = () => {
                 <Piano
                     startingOctave={startingOctave}
                     endingOctave={endingOctave}
-                    displayNames={!superAdvanced}
-                    activeNotes={beginner && [firstNote?.id, secondNote?.id].filter(Boolean) as string[]}
+                    displayNames={0 === level || 2 === level}
+                    activeNotes={0 === level && [firstNote?.id, secondNote?.id].filter(Boolean) as string[]}
+                    successNotes={success && [firstNote?.id, secondNote?.id].filter(Boolean) as string[]}
                     ref={pianoRef}
                 />
             </Box>

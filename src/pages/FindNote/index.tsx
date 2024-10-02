@@ -87,7 +87,8 @@ const FindNote = () => {
             >
                 {!currentNote && (
                     <Button
-                        size={'3'}
+                        mb={'2'}
+                        size={'4'}
                         onClick={next}
                     >
                         {t('start')}
@@ -123,14 +124,14 @@ const FindNote = () => {
                         >
                             {t('hits', { count: consecutiveSuccess })}
                         </Text>
-                        <Text
-                            size={'2'}
-                            color={success ? 'green' : 'gray'}
-                        >
-                            {t('personal_best', { count: personalBest })}
-                        </Text>
                     </>
                 )}
+                <Text
+                    size={'2'}
+                    color={success ? 'green' : 'gray'}
+                >
+                    {t('personal_best', { count: personalBest })}
+                </Text>
             </Flex>
 
             <Piano
