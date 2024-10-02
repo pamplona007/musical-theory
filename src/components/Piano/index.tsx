@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { createContext, ForwardedRef, forwardRef, PropsWithChildren, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { filterNotes, Note, noteName } from 'src/utils';
 import { PolySynth } from 'tone';
+import { Time } from 'tone/build/esm/core/type/Units';
 
 import styles from './styles.module.scss';
 
@@ -19,9 +20,9 @@ export type PianoProps = {
 }
 
 export type PianoRef = {
-    playNote: (note: Note, timing?: string) => void;
+    playNote: (note: Note, timing?: Time) => void;
     attackNote: (note: Note) => void;
-    releaseNote: (note: Note) => void;
+    releaseNote: (note: Note, timing?: Time) => void;
     availableNotes: Note[];
 }
 
@@ -126,17 +127,16 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
         onNotePress,
         startingOctave = 3,
         endingOctave = 5,
-        european = false,
         displayNames = true,
         activeNotes: externallyActiveNotes,
         successNotes,
         errorNotes,
     } = props;
 
-    const [activeNotes, setActiveNotes] = useState<string[]>([]);
+    const [activeNotes, setActiveNotes] = useState<Note[]>([]);
     const [volume, setVolume] = useState(Number(localStorage.getItem('pianoVolume') || 0));
 
-    const filteredNotes = filterNotes(startingOctave, endingOctave);
+    const filteredNotes = useMemo(() => filterNotes(startingOctave, endingOctave), [startingOctave, endingOctave]);
     const isMuted = -50 === volume;
 
     const refValue: PianoRef = useMemo(() => ({
@@ -144,16 +144,16 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
             synth.triggerAttackRelease(note.id, timing);
         },
         attackNote: (note) => {
-            if (activeNotes.includes(note.id)) {
+            if (activeNotes.find(({ id }) => id === note.id)) {
                 return;
             }
 
-            setActiveNotes([...activeNotes, note.id]);
+            setActiveNotes([...activeNotes, note]);
             synth.triggerAttack(note.id);
         },
-        releaseNote: (note) => {
-            setActiveNotes(activeNotes.filter((id) => id !== note.id));
-            synth.triggerRelease(note.id);
+        releaseNote: (note, timing) => {
+            setActiveNotes(activeNotes.filter(({ id }) => id !== note.id));
+            synth.triggerRelease(note.id, timing);
         },
         availableNotes: filteredNotes,
     }), [activeNotes, filteredNotes]);
@@ -171,6 +171,14 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
         }
     }, [isMuted, volume]);
 
+    useEffect(() => {
+        for (const note of activeNotes) {
+            if (!filteredNotes.find((filteredNote) => filteredNote.id === note.id)) {
+                refValue.releaseNote(note, '+16n');
+            }
+        }
+    }, [activeNotes, filteredNotes, refValue]);
+
     return (
         <PianoContext.Provider value={refValue}>
             <ScrollArea className={styles['piano-wrapper']}>
@@ -184,11 +192,11 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                             note={note}
                             handleNotePress={onNotePress}
                             keyboardKey={simple && keyboardKeys[index]}
-                            active={activeNotes.includes(note.id) || (externallyActiveNotes && externallyActiveNotes.includes(note.id))}
+                            active={activeNotes.includes(note) || (externallyActiveNotes && externallyActiveNotes.includes(note.id))}
                             success={successNotes?.includes(note.id)}
                             error={errorNotes?.includes(note.id)}
                         >
-                            {displayNames && noteName(note, { simple, european })}
+                            {displayNames && noteName(note, { simple })}
                         </NoteComponent>
                     ))}
                 </Flex>

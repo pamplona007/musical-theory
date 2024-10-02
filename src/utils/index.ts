@@ -1,7 +1,8 @@
+import i18n from '../translations/i18n';
+
 export type Note = {
     id: string;
     name: string;
-    european: string;
     frequency: number;
     octave: number;
     isSharp: boolean;
@@ -13,7 +14,6 @@ const getAudioFrequency = (n: number) => {
 };
 
 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const europeanNames = ['Do', 'Do', 'Re', 'Re', 'Mi', 'Fa', 'Fa', 'Sol', 'Sol', 'La', 'La', 'Si'];
 const startingMIDI = 12;
 
 export const getNotes = (): Note[] => {
@@ -22,14 +22,12 @@ export const getNotes = (): Note[] => {
     for (let octave = 0; 8 >= octave; octave++) {
         for (let i = 0; i < noteNames.length; i++) {
             const name = noteNames[i];
-            const european = europeanNames[i];
             const isSharp = name.includes('#');
             const frequency = getAudioFrequency(i + (octave * 12) - 9); // A0 is 27.5Hz and C0 is 16.35Hz
 
             notes.push({
                 id: `${name}${octave}`,
                 name: name.replace('#', ''),
-                european,
                 frequency,
                 octave,
                 isSharp,
@@ -49,11 +47,11 @@ export const filterNotes = (startingOctave: number, endingOctave: number) => {
     ));
 };
 
-export const noteName = (note: Note, options?: { simple?: boolean; european?:boolean }) => {
-    const { simple = false, european = false } = options || {};
+export const noteName = (note: Note, options?: { simple?: boolean; latin?:boolean }) => {
+    const { simple = false } = options || {};
 
     return [
-        european ? note.european : note.name,
+        i18n.t(note.name),
         note.isSharp && '#',
         !simple && note.octave,
     ].filter(Boolean).join('');

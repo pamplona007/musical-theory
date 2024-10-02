@@ -1,55 +1,71 @@
-import { Flex, Text } from '@radix-ui/themes';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Flex, Text } from '@radix-ui/themes';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Piano, { PianoRef } from 'src/components/Piano';
-import { filterNotes, Note, noteName } from 'src/utils';
+import useLeveling from 'src/hooks/useLeveling';
+import { Note, noteName } from 'src/utils';
 
-const NoteTranslation = () => {
+const startingLives = 3;
+
+const FindNote = () => {
     const [currentNote, setCurrentNote] = useState<Note | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
-    const [consecutiveSuccess, setConsecutiveSuccess] = useState<number>(0);
+    const [hitNotes, setHitNotes] = useState<Note[]>([]);
+    const [lives, setLives] = useState<number>(startingLives);
+    const {
+        level,
+        update,
+        consecutiveSuccess,
+        personalBest,
+    } = useLeveling({
+        localStorageKey: 'find-note-level',
+    });
 
     const { t } = useTranslation();
 
     const pianoRef = useRef<PianoRef>(null);
 
-    const beginner = 5 > consecutiveSuccess;
-    const advanced = 10 <= consecutiveSuccess;
-    const superAdvanced = 15 <= consecutiveSuccess;
+    const startingOctave = 2 <= level ? 3: 4;
+    const endingOctave = 2 <= level ? 5 : 4;
 
-    const startingOctave = advanced ? 3: 4;
-    const endingOctave = advanced ? 5 : 4;
-
-    const filteredNotes = useMemo(() => filterNotes(startingOctave, endingOctave), [startingOctave, endingOctave]);
-
-    const randomNote = useCallback(() => {
+    const next = useCallback(() => {
+        setHitNotes([]);
+        setLives(startingLives);
         setCurrentNote((currentNote) => {
             let randomIndex;
 
-            while (randomIndex === undefined || filteredNotes[randomIndex].id === currentNote?.id) {
-                randomIndex = Math.floor(Math.random() * filteredNotes.length);
+            if (!pianoRef.current?.availableNotes.length) {
+                return null;
             }
 
-            return filteredNotes[randomIndex];
+            while (randomIndex === undefined || pianoRef.current?.availableNotes[randomIndex].id === currentNote?.id) {
+                randomIndex = Math.floor(Math.random() * pianoRef.current?.availableNotes.length);
+            }
+
+            return pianoRef.current?.availableNotes[randomIndex];
         });
-    }, [filteredNotes]);
+    }, []);
 
     const onNotePress = (note: Note) => {
         if (!currentNote || success) {
             return;
         }
 
+        setHitNotes((hitNotes) => [...hitNotes, note]);
+
         if (note.id !== currentNote.id) {
-            setSuccess(false);
-            setConsecutiveSuccess(0);
+            setLives(lives - 1);
             return;
         }
 
+        console.log('hitNotes', hitNotes);
+
+        update(0 === hitNotes.length);
         setSuccess(true);
-        setConsecutiveSuccess(consecutiveSuccess + 1);
 
         setTimeout(() => {
             setSuccess(false);
+            next();
         }, 1000);
     };
 
@@ -61,14 +77,6 @@ const NoteTranslation = () => {
         pianoRef.current.playNote(currentNote);
     }, [currentNote]);
 
-    useEffect(() => {
-        if (success) {
-            return;
-        }
-
-        randomNote();
-    }, [randomNote, success]);
-
     return (
         <>
             <Flex
@@ -77,6 +85,14 @@ const NoteTranslation = () => {
                 height={'30vh'}
                 direction={'column'}
             >
+                {!currentNote && (
+                    <Button
+                        size={'3'}
+                        onClick={next}
+                    >
+                        {t('start')}
+                    </Button>
+                )}
                 {currentNote && (
                     <>
                         <button
@@ -96,16 +112,22 @@ const NoteTranslation = () => {
                             >
                                 {noteName(currentNote, {
                                     simple: startingOctave === endingOctave,
-                                    european: true,
                                 })}
                             </Text>
                         </button>
                         <Text
                             size={'4'}
                             weight={'bold'}
+                            mt={'2'}
                             color={success ? 'green' : 'gray'}
                         >
                             {t('hits', { count: consecutiveSuccess })}
+                        </Text>
+                        <Text
+                            size={'2'}
+                            color={success ? 'green' : 'gray'}
+                        >
+                            {t('personal_best', { count: personalBest })}
                         </Text>
                     </>
                 )}
@@ -115,12 +137,15 @@ const NoteTranslation = () => {
                 onNotePress={onNotePress}
                 startingOctave={startingOctave}
                 endingOctave={endingOctave}
-                displayNames={!superAdvanced}
-                activeNotes={currentNote && beginner ? [currentNote.id] : []}
+                displayNames={0 === level || 2 === level}
+                activeNotes={currentNote && 0 >= lives ? [currentNote.id] : []}
                 ref={pianoRef}
+                errorNotes={success ? [] : hitNotes.map((note) => note.id)}
+                successNotes={success && currentNote ? [currentNote.id] : []}
+                european
             />
         </>
     );
 };
 
-export default NoteTranslation;
+export default FindNote;

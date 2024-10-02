@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouteObject } from 'react-router-dom';
 import LayoutApp from 'src/components/LayoutApp';
+import FindNote from 'src/pages/FindNote';
 import GuitarTest from 'src/pages/GuitarTest';
 import Home from 'src/pages/Home';
 import NoteDistance from 'src/pages/NoteDistance';
-import NoteTranslation from 'src/pages/NoteTranslation';
 import Scales from 'src/pages/Scales';
 
 export const appRoutes: RouteObject[] = [
@@ -12,8 +12,8 @@ export const appRoutes: RouteObject[] = [
         element: <Home />,
     },
     {
-        path: '/note-translation',
-        element: <NoteTranslation />,
+        path: '/find-note',
+        element: <FindNote />,
     },
     {
         path: '/note-distance',

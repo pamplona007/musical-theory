@@ -115,7 +115,6 @@ const NoteDistance = () => {
                             >
                                 {noteName(firstNote, {
                                     simple: startingOctave === endingOctave,
-                                    european: true,
                                 })}
                             </Text>
                         </button>
@@ -139,7 +138,6 @@ const NoteDistance = () => {
                             >
                                 {noteName(secondNote, {
                                     simple: startingOctave === endingOctave,
-                                    european: true,
                                 })}
                             </Text>
                         </button>

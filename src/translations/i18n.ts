@@ -27,10 +27,19 @@ const resources = {
             'hits_zero': '{{count}} acertos',
             'hits_one': '{{count}} acerto',
             'hits_other': '{{count}} acertos',
+            'personal_best': 'Recorde pessoal: {{count}}',
             'tones_and_semitones': '$t(tone, {"count": {{tones}} }) e $t(semitone, {"count": {{semitones}} })',
             'distance_in_semitones': 'Distância em semitons',
             'confirm': 'Confirmar',
             'start': 'Iniciar',
+
+            'C': 'Dó',
+            'D': 'Ré',
+            'E': 'Mi',
+            'F': 'Fá',
+            'G': 'Sol',
+            'A': 'Lá',
+            'B': 'Si',
 
             'card.note_names.title': 'Nome das notas',
             'card.note_names.description': 'Vamos praticar o nome das notas musicais',
@@ -63,10 +72,19 @@ const resources = {
             'hits_zero': '{{count}} hits',
             'hits_one': '{{count}} hit',
             'hits_other': '{{count}} hits',
+            'personal_best': 'Personal Best: {{count}}',
             'tones_and_semitones': '$t(tone, {"count": {{tones}} }) and $t(semitone, {"count": {{semitones}} })',
             'distance_in_semitones': 'Distance in semitones',
             'confirm': 'Confirm',
             'start': 'Start',
+
+            'C': 'C',
+            'D': 'D',
+            'E': 'E',
+            'F': 'F',
+            'G': 'G',
+            'A': 'A',
+            'B': 'B',
 
             'card.note_names.title': 'Note Names',
             'card.note_names.description': 'Let\'s practice the names of musical notes',
@@ -99,10 +117,19 @@ const resources = {
             'hits_zero': '{{count}} hits',
             'hits_one': '{{count}} hit',
             'hits_other': '{{count}} hits',
+            'personal_best': 'Record personnel : {{count}}',
             'tones_and_semitones': '$t(tone, {"count": {{tones}} }) et $t(semitone, {"count": {{semitones}} })',
             'distance_in_semitones': 'Distance en demi-tons',
             'confirm': 'Confirmer',
             'start': 'Démarrer',
+
+            'C': 'Do',
+            'D': 'Ré',
+            'E': 'Mi',
+            'F': 'Fa',
+            'G': 'Sol',
+            'A': 'La',
+            'B': 'Si',
 
             'card.note_names.title': 'Noms des notes',
             'card.note_names.description': 'Pratiquons les noms des notes de musique',
@@ -128,8 +155,10 @@ const resources = {
     },
 };
 
-i18next
-    .createInstance()
+const i18n = i18next
+    .createInstance();
+
+i18n
     .use(I18nextBrowserLanguageDetector)
     .use(initReactI18next)
     .init({
@@ -141,4 +170,4 @@ i18next
         },
     });
 
-export default i18next;
+export default i18n;

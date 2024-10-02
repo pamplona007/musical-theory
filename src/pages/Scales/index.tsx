@@ -102,9 +102,7 @@ const Scales = () => {
                         weight={'bold'}
                         color={'gray'}
                     >
-                        {noteName(scaleOfNote, {
-                            european: true,
-                        })}
+                        {noteName(scaleOfNote)}
                     </Text>
                 </button>
             </Flex>
@@ -122,7 +120,6 @@ const Scales = () => {
                         color={'green'}
                     >
                         {noteName(note, {
-                            european: true,
                             simple: true,
                         })}
                     </Text>

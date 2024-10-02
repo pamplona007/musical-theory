@@ -39,7 +39,7 @@ const exercises = [
     {
         title: 'card.note_names.title',
         description: 'card.note_names.description',
-        path: '/note-translation',
+        path: '/find-note',
     },
     {
         title: 'card.note_distances.title',
