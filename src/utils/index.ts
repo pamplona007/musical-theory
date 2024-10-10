@@ -126,3 +126,161 @@ export const getScale = (note: Note, scale: string, options?: { ascending?: bool
 
     return scaleNotes;
 };
+
+interface IInterval {
+    name: string;
+    semitones: number;
+    short: string;
+}
+
+export const intervals = [
+    {
+        name: 'perfect_unison',
+        semitones: 0,
+        short: 'P1',
+    },
+    {
+        name: 'diminished_second',
+        semitones: 0,
+        short: 'd2',
+    },
+    {
+        name: 'minor_second',
+        semitones: 1,
+        short: 'm2',
+    },
+    {
+        name: 'augmented_unison',
+        semitones: 1,
+        short: 'A1',
+    },
+    {
+        name: 'major_second',
+        semitones: 2,
+        short: 'M2',
+    },
+    {
+        name: 'diminished_third',
+        semitones: 2,
+        short: 'd3',
+    },
+    {
+        name: 'minor_third',
+        semitones: 3,
+        short: 'm3',
+    },
+    {
+        name: 'augmented_second',
+        semitones: 3,
+        short: 'A2',
+    },
+    {
+        name: 'major_third',
+        semitones: 4,
+        short: 'M3',
+    },
+    {
+        name: 'diminished_fourth',
+        semitones: 4,
+        short: 'd4',
+    },
+    {
+        name: 'perfect_fourth',
+        semitones: 5,
+        short: 'P4',
+    },
+    {
+        name: 'augmented_third',
+        semitones: 5,
+        short: 'A3',
+    },
+    {
+        name: 'diminished_fifth',
+        semitones: 5,
+        short: 'd5',
+    },
+    {
+        name: 'augmented_fourth',
+        semitones: 6,
+        short: 'A4',
+    },
+    {
+        name: 'perfect_fifth',
+        semitones: 7,
+        short: 'P5',
+    },
+    {
+        name: 'diminished_sixth',
+        semitones: 7,
+        short: 'd6',
+    },
+    {
+        name: 'minor_sixth',
+        semitones: 8,
+        short: 'm6',
+    },
+    {
+        name: 'augmented_fifth',
+        semitones: 8,
+        short: 'A5',
+    },
+    {
+        name: 'major_sixth',
+        semitones: 9,
+        short: 'M6',
+    },
+    {
+        name: 'diminished_seventh',
+        semitones: 9,
+        short: 'd7',
+    },
+    {
+        name: 'minor_seventh',
+        semitones: 10,
+        short: 'm7',
+    },
+    {
+        name: 'augmented_sixth',
+        semitones: 10,
+        short: 'A6',
+    },
+    {
+        name: 'major_seventh',
+        semitones: 11,
+        short: 'M7',
+    },
+    {
+        name: 'diminished_octave',
+        semitones: 11,
+        short: 'd8',
+    },
+    {
+        name: 'perfect_octave',
+        semitones: 12,
+        short: 'P8',
+    },
+    {
+        name: 'augmented_seventh',
+        semitones: 12,
+        short: 'A7',
+    },
+];
+
+export const getIntervalNote = (note: Note, interval: IInterval, options?: { ascending?: boolean }) => {
+    const { ascending = true } = options || {};
+
+    const noteIndex = notes.findIndex((n) => n.id === note.id);
+
+    if (-1 === noteIndex) {
+        return null;
+    }
+
+    const targetNoteIndex = noteIndex + (ascending ? interval.semitones : -interval.semitones);
+    const targetNote = notes[targetNoteIndex];
+
+    if (!targetNote) {
+        return null;
+    }
+
+    return targetNote;
+};

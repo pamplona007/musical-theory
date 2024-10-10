@@ -54,6 +54,7 @@ const exercises = [
     {
         title: 'card.note_intervals.title',
         description: 'card.note_intervals.description',
+        path: '/intervals',
     },
     {
         title: 'card.note_read.title',

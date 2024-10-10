@@ -1,11 +1,11 @@
-import { Box, Flex, IconButton, Kbd, ScrollArea, Slider } from '@radix-ui/themes';
+import { Box, Flex, IconButton, ScrollArea, Slider } from '@radix-ui/themes';
 import { IconVolume, IconVolumeOff } from '@tabler/icons-react';
-import classNames from 'classnames';
-import { createContext, ForwardedRef, forwardRef, PropsWithChildren, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { createContext, ForwardedRef, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { filterNotes, Note, noteName } from 'src/utils';
 import { PolySynth } from 'tone';
 import { Time } from 'tone/build/esm/core/type/Units';
 
+import NoteComponent from './Note';
 import styles from './styles.module.scss';
 
 export type PianoProps = {
@@ -17,6 +17,7 @@ export type PianoProps = {
     activeNotes?: string[] | false;
     successNotes?: string[] | false;
     errorNotes?: string[] | false;
+    simple?: boolean;
 }
 
 export type PianoRef = {
@@ -26,101 +27,9 @@ export type PianoRef = {
     availableNotes: Note[];
 }
 
-type NoteComponentProps = {
-    note: Note;
-    handleNotePress?: (note: Note) => void;
-    active?: boolean;
-    keyboardKey?: string | false;
-    success?: boolean;
-    error?: boolean;
-}
-
 const keyboardKeys = ['a', 'w', 's', 'e', 'd', 'h', 'u', 'j', 'i', 'k', 'o', 'l'];
-const PianoContext = createContext<PianoRef | null>(null);
+export const PianoContext = createContext<PianoRef | null>(null);
 const synth = new PolySynth().toDestination();
-
-const NoteComponent = (props: PropsWithChildren<NoteComponentProps>) => {
-    const {
-        note,
-        handleNotePress,
-        children,
-        active,
-        keyboardKey,
-        success,
-        error,
-    } = props;
-
-    const isTouchDevice = 'ontouchstart' in window || 0 < navigator.maxTouchPoints;
-
-    const {
-        playNote,
-        attackNote,
-        releaseNote,
-    } = useContext(PianoContext)!;
-
-    const attackThisNote = useCallback(() => {
-        attackNote(note);
-        handleNotePress?.(note);
-    }, [attackNote, handleNotePress, note]);
-
-    const releaseThisNote = useCallback(() => {
-        releaseNote(note);
-    }, [releaseNote, note]);
-
-    const playThisNote = useCallback(() => {
-        playNote(note);
-        handleNotePress?.(note);
-    }, [playNote, note, handleNotePress]);
-
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === keyboardKey && !event.repeat) {
-                attackThisNote();
-            }
-        };
-
-        const handleKeyUp = (event: KeyboardEvent) => {
-            if (event.key === keyboardKey) {
-                releaseThisNote();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
-    }, [attackThisNote, keyboardKey, releaseThisNote]);
-
-    return (
-        <button
-            className={classNames(
-                styles.key,
-                {
-                    [styles.sharp]: note.isSharp,
-                    [styles.active]: active,
-                    [styles.success]: success,
-                    [styles.error]: error,
-                },
-            )}
-            onMouseLeave={() => releaseThisNote()}
-            onMouseDown={() => !isTouchDevice && attackThisNote()}
-            onMouseUp={() => !isTouchDevice && releaseThisNote()}
-            onClick={() => isTouchDevice && playThisNote()}
-        >
-            {keyboardKey && (
-                <Kbd
-                    size={'2'}
-                >
-                    {keyboardKey}
-                </Kbd>
-            )}
-            {children}
-        </button>
-    );
-};
 
 const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
     const {
@@ -128,9 +37,10 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
         startingOctave = 3,
         endingOctave = 5,
         displayNames = true,
-        activeNotes: externallyActiveNotes,
+        activeNotes: activeNotesProp,
         successNotes,
         errorNotes,
+        simple: simpleProp,
     } = props;
 
     const [activeNotes, setActiveNotes] = useState<Note[]>([]);
@@ -160,7 +70,7 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
 
     useImperativeHandle(ref, () => refValue);
 
-    const simple = startingOctave === endingOctave;
+    const simple = simpleProp || startingOctave === endingOctave;
 
     useEffect(() => {
         synth.volume.value = volume;
@@ -192,7 +102,7 @@ const Piano = (props: PianoProps, ref: ForwardedRef<PianoRef>) => {
                             note={note}
                             handleNotePress={onNotePress}
                             keyboardKey={simple && keyboardKeys[index]}
-                            active={activeNotes.includes(note) || (externallyActiveNotes && externallyActiveNotes.includes(note.id))}
+                            active={activeNotes.includes(note) || (activeNotesProp && activeNotesProp.includes(note.id))}
                             success={successNotes && successNotes.includes(note.id)}
                             error={errorNotes && errorNotes.includes(note.id)}
                         >
